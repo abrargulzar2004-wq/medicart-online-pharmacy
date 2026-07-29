@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" fill="none" role="img" aria-label="Product image unavailable">
+  <rect width="400" height="400" fill="#F8FAFC"/>
+  <rect x="0.5" y="0.5" width="399" height="399" stroke="#E2E8F0"/>
+  <path d="M200 118c-28 0-52 22-52 50v14c0 28 24 50 52 50s52-22 52-50v-14c0-28-24-50-52-50z" fill="#CBD5E1"/>
+  <rect x="168" y="232" width="64" height="50" rx="32" fill="#94A3B8"/>
+  <text x="200" y="310" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" fill="#64748B">No image</text>
+</svg>
