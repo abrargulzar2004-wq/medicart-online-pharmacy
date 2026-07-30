@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y \
         pdo \
         pdo_pgsql \
         pgsql \
-        zip
+        zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -17,10 +19,12 @@ WORKDIR /var/www
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction
 
-RUN php artisan config:clear && \
-    php artisan cache:clear
+RUN php artisan config:clear
 
 EXPOSE 10000
 
