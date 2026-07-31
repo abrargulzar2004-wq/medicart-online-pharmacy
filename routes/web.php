@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ShopController;
@@ -12,7 +15,6 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\InventoryController;
-
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\PageController;
 
@@ -32,23 +34,27 @@ Route::get('/require-auth', function () {
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login.submit');
+
 Route::get('/register', [AuthController::class, 'showRegister'])->name('auth.register');
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register.submit');
+
 Route::get('/otp-verify', [AuthController::class, 'showOtp'])->name('auth.otp.show');
 Route::post('/otp-verify', [AuthController::class, 'verifyOtp'])->name('auth.otp.submit');
+
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
 // Customer Protected Routes
 Route::middleware(['auth', 'customer'])->group(function () {
+
     // Dashboard & Profile
     Route::get('/customer/dashboard', [CustomerController::class, 'dashboard'])->name('customer.dashboard');
     Route::post('/customer/order/{order}/reupload', [CustomerController::class, 'reuploadPrescription'])->name('customer.prescription.reupload');
     Route::get('/customer/order/{order}/invoice', [CustomerController::class, 'invoice'])->name('customer.order.invoice');
-    
+
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
-    
+
     // Wishlist
     Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/add/{id}', [\App\Http\Controllers\WishlistController::class, 'add'])->name('wishlist.add');
@@ -61,21 +67,48 @@ Route::middleware(['auth', 'customer'])->group(function () {
 
 // Admin Protected Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
     Route::resource('categories', CategoryController::class);
     Route::resource('brands', BrandController::class);
     Route::resource('products', ProductController::class);
+
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
-    
+
     Route::get('/customers', [\App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers.index');
+
     Route::get('/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])->name('contacts.index');
     Route::get('/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'show'])->name('contacts.show');
     Route::post('/contacts/{contact}/replied', [\App\Http\Controllers\Admin\ContactController::class, 'markReplied'])->name('contacts.replied');
     Route::delete('/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'destroy'])->name('contacts.destroy');
+
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update');
     Route::post('/orders/{order}/prescription', [OrderController::class, 'updatePrescription'])->name('orders.prescription.update');
+});
+
+
+// =======================================================
+// TEMPORARY ADMIN PASSWORD RESET ROUTE
+// DELETE THIS AFTER SUCCESSFULLY LOGGING IN
+// =======================================================
+
+Route::get('/reset-admin', function () {
+
+    $user = User::where('email', 'abrargulzar2004@gmail.com')->first();
+
+    if (!$user) {
+        return "Admin user not found!";
+    }
+
+    $user->password = Hash::make('Admin12345');
+    $user->save();
+
+    return "✅ Admin password reset successfully!<br><br>
+    Email: abrargulzar2004@gmail.com<br>
+    Password: Admin12345";
 });
