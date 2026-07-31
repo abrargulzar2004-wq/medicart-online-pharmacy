@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -18,21 +16,37 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\PageController;
 
+// ===============================
 // Storefront Routes
+// ===============================
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
+
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
 
-// Guest Redirect Route for protected actions
+// ===============================
+// Guest Redirect
+// ===============================
+
 Route::get('/require-auth', function () {
-    return redirect()->route('auth.login')->with('error', 'Please sign in or create an account to continue shopping.');
+    return redirect()->route('auth.login')
+        ->with('error', 'Please sign in or create an account to continue shopping.');
 })->name('require.auth');
 
+// ===============================
 // Authentication Routes
-Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
+// ===============================
+
+// IMPORTANT: Give the login page BOTH route names.
+Route::get('/login', [AuthController::class, 'showLogin'])
+    ->name('login')
+    ->name('auth.login');
+
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login.submit');
 
 Route::get('/register', [AuthController::class, 'showRegister'])->name('auth.register');
@@ -43,13 +57,19 @@ Route::post('/otp-verify', [AuthController::class, 'verifyOtp'])->name('auth.otp
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
-// Customer Protected Routes
+// ===============================
+// Customer Routes
+// ===============================
+
 Route::middleware(['auth', 'customer'])->group(function () {
 
-    // Dashboard & Profile
     Route::get('/customer/dashboard', [CustomerController::class, 'dashboard'])->name('customer.dashboard');
-    Route::post('/customer/order/{order}/reupload', [CustomerController::class, 'reuploadPrescription'])->name('customer.prescription.reupload');
-    Route::get('/customer/order/{order}/invoice', [CustomerController::class, 'invoice'])->name('customer.order.invoice');
+
+    Route::post('/customer/order/{order}/reupload', [CustomerController::class, 'reuploadPrescription'])
+        ->name('customer.prescription.reupload');
+
+    Route::get('/customer/order/{order}/invoice', [CustomerController::class, 'invoice'])
+        ->name('customer.order.invoice');
 
     // Cart
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -65,50 +85,49 @@ Route::middleware(['auth', 'customer'])->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'process'])->name('checkout.process');
 });
 
-// Admin Protected Routes
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+// ===============================
+// Admin Routes
+// ===============================
 
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    Route::resource('categories', CategoryController::class);
-    Route::resource('brands', BrandController::class);
-    Route::resource('products', ProductController::class);
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+        Route::resource('categories', CategoryController::class);
+        Route::resource('brands', BrandController::class);
+        Route::resource('products', ProductController::class);
 
-    Route::get('/customers', [\App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers.index');
+        Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 
-    Route::get('/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])->name('contacts.index');
-    Route::get('/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'show'])->name('contacts.show');
-    Route::post('/contacts/{contact}/replied', [\App\Http\Controllers\Admin\ContactController::class, 'markReplied'])->name('contacts.replied');
-    Route::delete('/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'destroy'])->name('contacts.destroy');
+        Route::get('/customers', [\App\Http\Controllers\Admin\CustomerController::class, 'index'])
+            ->name('customers.index');
 
-    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
+        Route::get('/contacts', [\App\Http\Controllers\Admin\ContactController::class, 'index'])
+            ->name('contacts.index');
 
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update');
-    Route::post('/orders/{order}/prescription', [OrderController::class, 'updatePrescription'])->name('orders.prescription.update');
-});
+        Route::get('/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'show'])
+            ->name('contacts.show');
 
+        Route::post('/contacts/{contact}/replied', [\App\Http\Controllers\Admin\ContactController::class, 'markReplied'])
+            ->name('contacts.replied');
 
-// =======================================================
-// TEMPORARY ADMIN PASSWORD RESET ROUTE
-// DELETE THIS AFTER SUCCESSFULLY LOGGING IN
-// =======================================================
+        Route::delete('/contacts/{contact}', [\App\Http\Controllers\Admin\ContactController::class, 'destroy'])
+            ->name('contacts.destroy');
 
-Route::get('/debug-users', function () {
-    return \App\Models\User::select('id', 'name', 'email', 'role')->get();
-});
-Route::get('/create-admin', function () {
+        Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])
+            ->name('settings.index');
 
-    $admin = User::create([
-        'name' => 'Store Admin',
-        'email' => 'abrargulzar2004@gmail.com',
-        'password' => Hash::make('123456789'),
-        'role' => 'admin',
-        'email_verified_at' => now(),
-    ]);
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 
-    return 'Admin created successfully!';
-});
+        Route::get('/orders/{order}', [OrderController::class, 'show'])
+            ->name('orders.show');
+
+        Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])
+            ->name('orders.update');
+
+        Route::post('/orders/{order}/prescription', [OrderController::class, 'updatePrescription'])
+            ->name('orders.prescription.update');
+    });
