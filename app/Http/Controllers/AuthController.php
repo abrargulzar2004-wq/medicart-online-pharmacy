@@ -3,63 +3,71 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Mail\OtpMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\OtpMail;
 
 class AuthController extends Controller
 {
+    // ==========================
+    // Show Login
+    // ==========================
     public function showLogin()
     {
         return view('auth.login');
     }
 
+    // ==========================
+    // Login
+    // ==========================
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        $credentials = [
-            'email' => $request->email,
-            'password' => $request->password
-        ];
+        $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-
-            $request->session()->regenerate();
-
-            $user = Auth::user();
-
-            if ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-
-            return redirect()->route('home');
+        if (!Auth::attempt($credentials)) {
+            return back()
+                ->withErrors([
+                    'email' => 'Invalid email or password.',
+                ])
+                ->withInput();
         }
 
-        return back()
-            ->withErrors([
-                'email' => 'Invalid email or password.'
-            ])
-            ->withInput();
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('customer.dashboard');
     }
 
+    // ==========================
+    // Show Register
+    // ==========================
     public function showRegister()
     {
         return view('auth.register');
     }
 
+    // ==========================
+    // Register
+    // ==========================
     public function register(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed'
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         $otp = rand(100000, 999999);
@@ -68,66 +76,74 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'customer'
+            'role' => 'customer',
+            'otp' => $otp,
         ]);
 
-        $user->update([
-            'otp' => $otp
-        ]);
+        Log::info("OTP for {$user->email}: {$otp}");
 
-        Log::info("OTP for {$user->email} is {$otp}");
+        try {
+            Mail::to($user->email)->send(new OtpMail($otp));
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
 
-        // Send OTP Email (Do NOT hide errors)
-        Mail::to($user->email)->send(new OtpMail($otp));
-
-        session([
-            'otp_email' => $user->email
-        ]);
+        session(['otp_email' => $user->email]);
 
         return redirect()
             ->route('auth.otp.show')
             ->with('success', 'Registration successful. Check your email for the OTP.');
     }
 
+    // ==========================
+    // Show OTP
+    // ==========================
     public function showOtp()
     {
-        if (!session('otp_email')) {
+        if (!session()->has('otp_email')) {
             return redirect()->route('auth.register');
         }
 
         return view('auth.otp');
     }
 
+    // ==========================
+    // Verify OTP
+    // ==========================
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'otp' => 'required'
+            'otp' => 'required',
         ]);
 
-        $email = session('otp_email');
+        $user = User::where('email', session('otp_email'))->first();
 
-        $user = User::where('email', $email)->first();
-
-        if ($user && $user->otp == $request->otp) {
-
-            $user->update([
-                'email_verified_at' => now(),
-                'otp' => null
-            ]);
-
-            Auth::login($user);
-
-            session()->forget('otp_email');
-
-            return redirect()->route('home');
+        if (!$user || $user->otp != $request->otp) {
+            return back()->with('error', 'Invalid OTP.');
         }
 
-        return back()->with('error', 'Invalid OTP.');
+        $user->update([
+            'otp' => null,
+            'email_verified_at' => now(),
+        ]);
+
+        Auth::login($user);
+
+        session()->forget('otp_email');
+
+        return redirect()->route('customer.dashboard');
     }
 
-    public function logout()
+    // ==========================
+    // Logout
+    // ==========================
+    public function logout(Request $request)
     {
         Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
 
         return redirect()->route('home');
     }
