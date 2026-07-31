@@ -97,18 +97,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // DELETE THIS AFTER SUCCESSFULLY LOGGING IN
 // =======================================================
 
-Route::get('/reset-admin', function () {
-
-    $user = User::where('email', 'abrargulzar2004@gmail.com')->first();
-
-    if (!$user) {
-        return "Admin user not found!";
-    }
-
-    $user->password = Hash::make('Admin12345');
-    $user->save();
-
-    return "✅ Admin password reset successfully!<br><br>
-    Email: abrargulzar2004@gmail.com<br>
-    Password: Admin12345";
+Route::get('/debug-users', function () {
+    return \App\Models\User::select('id', 'name', 'email', 'role')->get();
 });
