@@ -100,3 +100,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::get('/debug-users', function () {
     return \App\Models\User::select('id', 'name', 'email', 'role')->get();
 });
+Route::get('/create-admin', function () {
+
+    $admin = User::create([
+        'name' => 'Store Admin',
+        'email' => 'abrargulzar2004@gmail.com',
+        'password' => Hash::make('123456789'),
+        'role' => 'admin',
+        'email_verified_at' => now(),
+    ]);
+
+    return 'Admin created successfully!';
+});
