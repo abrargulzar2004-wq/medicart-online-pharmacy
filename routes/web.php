@@ -16,9 +16,11 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\PageController;
 
-//=====================================================
-// Storefront
-//=====================================================
+/*
+|--------------------------------------------------------------------------
+| Storefront
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -29,18 +31,16 @@ Route::post('/contact', [PageController::class, 'submitContact'])->name('contact
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
 
-//=====================================================
-// Require Login
-//=====================================================
-
 Route::get('/require-auth', function () {
     return redirect()->route('login')
-        ->with('error', 'Please login first.');
+        ->with('error', 'Please sign in or create an account to continue shopping.');
 })->name('require.auth');
 
-//=====================================================
-// Authentication
-//=====================================================
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 
@@ -60,114 +60,95 @@ Route::post('/otp-verify', [AuthController::class, 'verifyOtp'])
     ->name('auth.otp.submit');
 
 Route::post('/logout', [AuthController::class, 'logout'])
-    ->name('logout');
+    ->name('auth.logout');
 
-//=====================================================
-// Customer
-//=====================================================
+/*
+|--------------------------------------------------------------------------
+| Customer Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::middleware(['auth','customer'])->group(function () {
+Route::middleware(['auth', 'customer'])->group(function () {
 
-    Route::get('/customer/dashboard',[CustomerController::class,'dashboard'])
+    Route::get('/customer/dashboard', [CustomerController::class, 'dashboard'])
         ->name('customer.dashboard');
 
-    Route::post('/customer/order/{order}/reupload',
-        [CustomerController::class,'reuploadPrescription'])
+    Route::post('/customer/order/{order}/reupload', [CustomerController::class, 'reuploadPrescription'])
         ->name('customer.prescription.reupload');
 
-    Route::get('/customer/order/{order}/invoice',
-        [CustomerController::class,'invoice'])
+    Route::get('/customer/order/{order}/invoice', [CustomerController::class, 'invoice'])
         ->name('customer.order.invoice');
 
-    Route::get('/cart',[CartController::class,'index'])
+    Route::get('/cart', [CartController::class, 'index'])
         ->name('cart.index');
 
-    Route::post('/cart/add/{id}',
-        [CartController::class,'add'])
+    Route::post('/cart/add/{id}', [CartController::class, 'add'])
         ->name('cart.add');
 
-    Route::get('/wishlist',
-        [\App\Http\Controllers\WishlistController::class,'index'])
+    Route::get('/wishlist', [App\Http\Controllers\WishlistController::class, 'index'])
         ->name('wishlist.index');
 
-    Route::post('/wishlist/add/{id}',
-        [\App\Http\Controllers\WishlistController::class,'add'])
+    Route::post('/wishlist/add/{id}', [App\Http\Controllers\WishlistController::class, 'add'])
         ->name('wishlist.add');
 
-    Route::post('/wishlist/remove/{id}',
-        [\App\Http\Controllers\WishlistController::class,'remove'])
+    Route::post('/wishlist/remove/{id}', [App\Http\Controllers\WishlistController::class, 'remove'])
         ->name('wishlist.remove');
 
-    Route::get('/checkout',
-        [CheckoutController::class,'index'])
+    Route::get('/checkout', [CheckoutController::class, 'index'])
         ->name('checkout.index');
 
-    Route::post('/checkout',
-        [CheckoutController::class,'process'])
+    Route::post('/checkout', [CheckoutController::class, 'process'])
         ->name('checkout.process');
 });
 
-//=====================================================
-// Admin
-//=====================================================
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::middleware(['auth','admin'])
+Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard',
-            [AdminController::class,'dashboard'])
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])
             ->name('dashboard');
 
-        Route::resource('categories',CategoryController::class);
+        Route::resource('categories', CategoryController::class);
+        Route::resource('brands', BrandController::class);
+        Route::resource('products', ProductController::class);
 
-        Route::resource('brands',BrandController::class);
-
-        Route::resource('products',ProductController::class);
-
-        Route::get('/inventory',
-            [InventoryController::class,'index'])
+        Route::get('/inventory', [InventoryController::class, 'index'])
             ->name('inventory.index');
 
-        Route::get('/customers',
-            [\App\Http\Controllers\Admin\CustomerController::class,'index'])
+        Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])
             ->name('customers.index');
 
-        Route::get('/contacts',
-            [\App\Http\Controllers\Admin\ContactController::class,'index'])
+        Route::get('/contacts', [App\Http\Controllers\Admin\ContactController::class, 'index'])
             ->name('contacts.index');
 
-        Route::get('/contacts/{contact}',
-            [\App\Http\Controllers\Admin\ContactController::class,'show'])
+        Route::get('/contacts/{contact}', [App\Http\Controllers\Admin\ContactController::class, 'show'])
             ->name('contacts.show');
 
-        Route::post('/contacts/{contact}/replied',
-            [\App\Http\Controllers\Admin\ContactController::class,'markReplied'])
+        Route::post('/contacts/{contact}/replied', [App\Http\Controllers\Admin\ContactController::class, 'markReplied'])
             ->name('contacts.replied');
 
-        Route::delete('/contacts/{contact}',
-            [\App\Http\Controllers\Admin\ContactController::class,'destroy'])
+        Route::delete('/contacts/{contact}', [App\Http\Controllers\Admin\ContactController::class, 'destroy'])
             ->name('contacts.destroy');
 
-        Route::get('/settings',
-            [\App\Http\Controllers\Admin\SettingController::class,'index'])
+        Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])
             ->name('settings.index');
 
-        Route::get('/orders',
-            [OrderController::class,'index'])
+        Route::get('/orders', [OrderController::class, 'index'])
             ->name('orders.index');
 
-        Route::get('/orders/{order}',
-            [OrderController::class,'show'])
+        Route::get('/orders/{order}', [OrderController::class, 'show'])
             ->name('orders.show');
 
-        Route::post('/orders/{order}/status',
-            [OrderController::class,'updateStatus'])
+        Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.update');
 
-        Route::post('/orders/{order}/prescription',
-            [OrderController::class,'updatePrescription'])
+        Route::post('/orders/{order}/prescription', [OrderController::class, 'updatePrescription'])
             ->name('orders.prescription.update');
-
     });
