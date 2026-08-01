@@ -18,7 +18,7 @@ A Secure, Responsive and Modern Full Stack E-Commerce Web Application for an Onl
 
 | Resource | Link |
 |----------|------|
-| 🚀 Live Demo | https://github.com/abrargulzar2004-wq/medicart-online-pharmacy.git |
+| 🚀 Live Demo |  https://medicart-online-pharmacy.onrender.com |
 | 💻 GitHub Repository | https://github.com/your-username/medicart |
 
 > Replace the placeholder URLs with your actual Live Demo and GitHub Repository before submission.
