@@ -70,18 +70,20 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
-        $otp = rand(100000, 999999);
+        // $otp = rand(100000, 999999);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'customer',
-            'otp' => $otp,
+            'otp' => null, // $otp,
+            'email_verified_at' => now(), // Bypass OTP verification
         ]);
 
-        Log::info("OTP for {$user->email}: {$otp}");
+        // Log::info("OTP for {$user->email}: {$otp}");
 
+        /*
         try {
             Mail::to($user->email)->send(new OtpMail($otp));
         } catch (\Exception $e) {
@@ -93,6 +95,14 @@ class AuthController extends Controller
         return redirect()
             ->route('auth.otp.show')
             ->with('success', 'Registration successful. Check your email for the OTP.');
+        */
+
+        // Bypass: Log the user in immediately
+        Auth::login($user);
+
+        return redirect()
+            ->route('customer.dashboard')
+            ->with('success', 'Registration successful.');
     }
 
     // ==========================
