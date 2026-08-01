@@ -20,6 +20,6 @@ class AdminMiddleware
             return $next($request);
         }
         
-        return redirect()->route('auth.login')->withErrors(['email' => 'Unauthorized access.']);
+        return redirect()->route('login')->withErrors(['email' => 'Unauthorized access.']);
     }
 }

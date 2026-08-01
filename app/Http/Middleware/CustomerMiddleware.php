@@ -20,6 +20,6 @@ class CustomerMiddleware
             return $next($request);
         }
         
-        return redirect()->route('auth.login')->withErrors(['email' => 'Please login to access customer dashboard.']);
+        return redirect()->route('login')->withErrors(['email' => 'Please login to access customer dashboard.']);
     }
 }

@@ -202,7 +202,7 @@ $register = <<<HTML
         </div>
         <button type="submit" class="btn">Register</button>
     </form>
-    <a href="{{ route('auth.login') }}" class="link">Already have an account? Login</a>
+    <a href="{{ route('login') }}" class="link">Already have an account? Login</a>
 @endsection
 HTML;
 file_put_contents($viewsDir . '/register.blade.php', $register);

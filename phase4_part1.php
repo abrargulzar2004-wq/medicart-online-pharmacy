@@ -50,7 +50,7 @@ $layout = <<<HTML
                     <button type="submit" style="background:none; border:none; color:var(--dark); font-weight:bold; cursor:pointer;">Logout</button>
                 </form>
             @else
-                <a href="{{ route('auth.login') }}">Login</a>
+                <a href="{{ route('login') }}">Login</a>
                 <a href="{{ route('auth.register') }}" class="btn btn-primary">Register</a>
             @endauth
         </nav>

@@ -333,7 +333,7 @@ file_put_contents($viewsDir . '/cart/index.blade.php', <<<HTML
                     @auth
                         <a href="{{ route('checkout.index') }}" class="btn btn-primary" style="display: block; text-align: center; width: 100%; box-sizing: border-box;">Proceed to Checkout</a>
                     @else
-                        <a href="{{ route('auth.login') }}" class="btn" style="display: block; text-align: center; width: 100%; box-sizing: border-box; background: var(--dark); color: #fff;">Login to Checkout</a>
+                        <a href="{{ route('login') }}" class="btn" style="display: block; text-align: center; width: 100%; box-sizing: border-box; background: var(--dark); color: #fff;">Login to Checkout</a>
                     @endauth
                 </div>
             </div>
