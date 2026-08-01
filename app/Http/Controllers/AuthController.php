@@ -6,9 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OtpMail;
+// use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Mail;
+// use App\Mail\OtpMail;
 
 class AuthController extends Controller
 {
@@ -77,8 +77,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'customer',
-            'otp' => null, // $otp,
-            'email_verified_at' => now(), // Bypass OTP verification
+            'otp' => null, // OTP explicitly bypassed
+            'email_verified_at' => now(), // Bypass OTP verification check
         ]);
 
         // Log::info("OTP for {$user->email}: {$otp}");
