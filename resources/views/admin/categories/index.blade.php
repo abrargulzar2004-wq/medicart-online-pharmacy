@@ -23,8 +23,12 @@
                 <td style="padding:15px;">{{ $category->slug }}</td>
                 <td style="padding:15px;">{{ $category->status ? 'Active' : 'Inactive' }}</td>
                 <td style="padding:15px; text-align:center;">
-                    <a href="#" class="admin-link" style="margin-right:10px;">Edit</a>
-                    <a href="#" style="color:#DC2626; text-decoration:none; font-weight:600;">Delete</a>
+                    <a href="{{ route('admin.categories.edit', $category->id) }}" class="admin-link" style="margin-right:10px;">Edit</a>
+                    <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this category?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" style="color:#DC2626; text-decoration:none; font-weight:600; background:none; border:none; cursor:pointer; padding:0;">Delete</button>
+                    </form>
                 </td>
             </tr>
             @endforeach

@@ -24,7 +24,13 @@
                         <span style="color:#059669; font-weight:600;">In Stock</span>
                     @endif
                 </td>
-                <td style="padding:15px;">{{ $product->stock_quantity }}</td>
+                <td style="padding:15px;">
+                    <form action="{{ route('admin.inventory.update', $product->id) }}" method="POST" style="display:flex; align-items:center;">
+                        @csrf
+                        <input type="number" name="stock_quantity" value="{{ $product->stock_quantity }}" min="0" style="width:70px; padding:5px; margin-right:10px;">
+                        <button type="submit" class="admin-btn-primary" style="padding:5px 10px; font-size:14px;">Update</button>
+                    </form>
+                </td>
             </tr>
             @endforeach
         </tbody>

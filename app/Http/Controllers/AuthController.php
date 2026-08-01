@@ -85,7 +85,7 @@ class AuthController extends Controller
         try {
             Mail::to($user->email)->send(new OtpMail($otp));
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
+            dd($e->getMessage());
         }
 
         session(['otp_email' => $user->email]);

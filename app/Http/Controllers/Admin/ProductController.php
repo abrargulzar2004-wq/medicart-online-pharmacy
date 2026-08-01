@@ -98,6 +98,13 @@ class ProductController extends Controller
     }
 
     public function destroy(Product $product) {
+        // Delete unused uploaded images
+        $images = $product->images;
+        if ($images) {
+            foreach ($images as $img) {
+                Storage::disk('public')->delete($img->image_path);
+            }
+        }
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully');
     }

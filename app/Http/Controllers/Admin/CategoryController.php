@@ -33,4 +33,33 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories.index')->with('success', 'Category created successfully');
     }
+
+    public function edit($id) {
+        $category = Category::findOrFail($id);
+        return view('admin.categories.edit', compact('category'));
+    }
+
+    public function update(Request $request, $id) {
+        $category = Category::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string'
+        ]);
+
+        $category->update([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+            'status' => $request->has('status')
+        ]);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully');
+    }
+
+    public function destroy($id) {
+        $category = Category::findOrFail($id);
+        $category->delete();
+        return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully');
+    }
 }

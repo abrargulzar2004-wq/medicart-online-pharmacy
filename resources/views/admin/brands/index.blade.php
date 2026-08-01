@@ -20,7 +20,12 @@
                 <td style="padding:15px;">{{ $brand->name }}</td>
                 <td style="padding:15px;">{{ $brand->status ? 'Active' : 'Inactive' }}</td>
                 <td style="padding:15px; text-align:center;">
-                    <a href="{{ route('admin.brands.edit', $brand) }}" class="admin-link">Edit</a>
+                    <a href="{{ route('admin.brands.edit', $brand) }}" class="admin-link" style="margin-right:10px;">Edit</a>
+                    <form action="{{ route('admin.brands.destroy', $brand) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this brand?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" style="color:#DC2626; text-decoration:none; font-weight:600; background:none; border:none; cursor:pointer; padding:0;">Delete</button>
+                    </form>
                 </td>
             </tr>
             @endforeach

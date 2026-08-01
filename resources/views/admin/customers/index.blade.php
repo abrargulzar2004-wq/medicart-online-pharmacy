@@ -13,6 +13,7 @@
                 <th style="padding: 12px; text-align: left;">Name</th>
                 <th style="padding: 12px; text-align: left;">Email</th>
                 <th style="padding: 12px; text-align: left;">Joined Date</th>
+                <th style="padding: 12px; text-align: center;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -22,6 +23,14 @@
                     <td style="padding: 12px; font-weight: 600;">{{ $customer->name }}</td>
                     <td style="padding: 12px;">{{ $customer->email }}</td>
                     <td style="padding: 12px;">{{ $customer->created_at->format('M d, Y') }}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <a href="{{ route('admin.customers.edit', $customer->id) }}" class="admin-link" style="margin-right:10px;">Edit</a>
+                        <form action="{{ route('admin.customers.destroy', $customer->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this customer?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" style="color:#DC2626; text-decoration:none; font-weight:600; background:none; border:none; cursor:pointer; padding:0;">Delete</button>
+                        </form>
+                    </td>
                 </tr>
             @empty
                 <tr>

@@ -9,37 +9,44 @@
     
     <h2 style="margin-top: 0; border-bottom: 1px solid #E2E8F0; padding-bottom: 10px; color: #0F172A;">Appearance Preferences</h2>
     
-    <!-- Theme Setting -->
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #E2E8F0;">
-        <div>
-            <h3 style="margin: 0 0 5px 0;">Dark Mode</h3>
-            <p style="margin: 0; color: #64748B; font-size: 14px;">Switch the admin dashboard to a darker color scheme.</p>
+    <form action="{{ route('admin.settings.update') }}" method="POST">
+        @csrf
+        <!-- Theme Setting -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #E2E8F0;">
+            <div>
+                <h3 style="margin: 0 0 5px 0;">Dark Mode</h3>
+                <p style="margin: 0; color: #64748B; font-size: 14px;">Switch the admin dashboard to a darker color scheme.</p>
+            </div>
+            <div>
+                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 28px;">
+                    <input type="checkbox" name="admin_theme" id="themeToggle" value="dark" {{ (isset($settings['admin_theme']) && $settings['admin_theme'] == 'dark') ? 'checked' : '' }} style="opacity: 0; width: 0; height: 0;" onchange="toggleTheme()">
+                    <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;">
+                        <span class="knob" style="position: absolute; content: ''; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                    </span>
+                </label>
+            </div>
         </div>
-        <div>
-            <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 28px;">
-                <input type="checkbox" id="themeToggle" style="opacity: 0; width: 0; height: 0;" onchange="toggleTheme()">
-                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;">
-                    <span class="knob" style="position: absolute; content: ''; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
-                </span>
-            </label>
-        </div>
-    </div>
 
-    <!-- Sidebar Setting -->
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
-        <div>
-            <h3 style="margin: 0 0 5px 0;">Compact Sidebar</h3>
-            <p style="margin: 0; color: #64748B; font-size: 14px;">Minimize the sidebar to show only icons and save screen space.</p>
+        <!-- Sidebar Setting -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
+            <div>
+                <h3 style="margin: 0 0 5px 0;">Compact Sidebar</h3>
+                <p style="margin: 0; color: #64748B; font-size: 14px;">Minimize the sidebar to show only icons and save screen space.</p>
+            </div>
+            <div>
+                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 28px;">
+                    <input type="checkbox" name="admin_sidebar" id="sidebarToggle" value="compact" {{ (isset($settings['admin_sidebar']) && $settings['admin_sidebar'] == 'compact') ? 'checked' : '' }} style="opacity: 0; width: 0; height: 0;" onchange="toggleSidebar()">
+                    <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;">
+                        <span class="knob" style="position: absolute; content: ''; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                    </span>
+                </label>
+            </div>
         </div>
-        <div>
-            <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 28px;">
-                <input type="checkbox" id="sidebarToggle" style="opacity: 0; width: 0; height: 0;" onchange="toggleSidebar()">
-                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;">
-                    <span class="knob" style="position: absolute; content: ''; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
-                </span>
-            </label>
+
+        <div style="margin-top: 20px; text-align: right;">
+            <button type="submit" class="admin-btn-primary">Save Settings</button>
         </div>
-    </div>
+    </form>
 
 </div>
 

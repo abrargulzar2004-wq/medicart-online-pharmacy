@@ -121,9 +121,17 @@ Route::middleware(['auth', 'admin'])
 
         Route::get('/inventory', [InventoryController::class, 'index'])
             ->name('inventory.index');
+        Route::post('/inventory/{product}', [InventoryController::class, 'update'])
+            ->name('inventory.update');
 
         Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])
             ->name('customers.index');
+        Route::get('/customers/{user}/edit', [App\Http\Controllers\Admin\CustomerController::class, 'edit'])
+            ->name('customers.edit');
+        Route::put('/customers/{user}', [App\Http\Controllers\Admin\CustomerController::class, 'update'])
+            ->name('customers.update');
+        Route::delete('/customers/{user}', [App\Http\Controllers\Admin\CustomerController::class, 'destroy'])
+            ->name('customers.destroy');
 
         Route::get('/contacts', [App\Http\Controllers\Admin\ContactController::class, 'index'])
             ->name('contacts.index');
@@ -139,6 +147,8 @@ Route::middleware(['auth', 'admin'])
 
         Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])
             ->name('settings.index');
+        Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])
+            ->name('settings.update');
 
         Route::get('/orders', [OrderController::class, 'index'])
             ->name('orders.index');
