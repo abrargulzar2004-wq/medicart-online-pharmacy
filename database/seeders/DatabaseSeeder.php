@@ -11,6 +11,7 @@ use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\User;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,14 +28,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. Clear Tables
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Category::truncate();
-        Brand::truncate();
-        Product::truncate();
-        ProductImage::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
+        // No truncation - safe for repeated execution
         // 3. Seed Categories
         $categories = [
             ['name' => 'Prescription Medicines', 'description' => 'Medicines requiring a doctor prescription.', 'icon' => 'ph-prescription'],
@@ -47,23 +41,27 @@ class DatabaseSeeder extends Seeder
 
         $categoryIds = [];
         foreach ($categories as $cat) {
-            $categoryIds[$cat['name']] = Category::create([
-                'name' => $cat['name'],
-                'slug' => Str::slug($cat['name']),
-                'description' => $cat['description'],
-                'status' => 1
-            ])->id;
+            $categoryIds[$cat['name']] = Category::firstOrCreate(
+                ['name' => $cat['name']],
+                [
+                    'slug' => Str::slug($cat['name']),
+                    'description' => $cat['description'],
+                    'status' => 1
+                ]
+            )->id;
         }
 
         // 4. Seed Brands
         $brandNames = ['Pfizer', 'Johnson & Johnson', 'Bayer', 'Novartis', 'GSK', 'BioDerma', 'CeraVe', 'Pampers', 'Omron', 'Band-Aid', 'Generic'];
         $brandIds = [];
         foreach ($brandNames as $brand) {
-            $brandIds[$brand] = Brand::create([
-                'name' => $brand,
-                'slug' => Str::slug($brand),
-                'status' => 1
-            ])->id;
+            $brandIds[$brand] = Brand::firstOrCreate(
+                ['name' => $brand],
+                [
+                    'slug' => Str::slug($brand),
+                    'status' => 1
+                ]
+            )->id;
         }
 
         // 5. Seed Products + Images, then repair any broken paths

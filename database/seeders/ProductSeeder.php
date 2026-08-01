@@ -82,28 +82,34 @@ class ProductSeeder extends Seeder
                 continue;
             }
 
-            $product = Product::create([
-                'category_id' => $categoryIds[$item['cat']],
-                'brand_id' => $brandIds[$item['brand']],
-                'name' => $item['name'],
-                'slug' => Str::slug($item['name']) . '-' . rand(1000, 9999),
-                'description' => "Professional grade {$item['name']} manufactured by {$item['brand']}. Highly recommended by healthcare professionals for optimal results. Ensure you read the label before usage.",
-                'price' => $item['price'],
-                'stock_quantity' => $item['stock'],
-                'sku' => strtoupper(substr($item['brand'], 0, 3)) . '-' . rand(10000, 99999),
-                'batch_number' => 'BCH-' . rand(1000, 9999),
-                'requires_prescription' => $item['rx'],
-                'is_featured' => rand(1, 10) > 7 ? 1 : 0,
-                'is_new_arrival' => rand(1, 10) > 8 ? 1 : 0,
-                'is_best_seller' => rand(1, 10) > 7 ? 1 : 0,
-                'status' => 1,
-            ]);
+            $product = Product::firstOrCreate(
+                ['name' => $item['name']],
+                [
+                    'category_id' => $categoryIds[$item['cat']],
+                    'brand_id' => $brandIds[$item['brand']],
+                    'slug' => Str::slug($item['name']) . '-' . rand(1000, 9999),
+                    'description' => "Professional grade {$item['name']} manufactured by {$item['brand']}. Highly recommended by healthcare professionals for optimal results. Ensure you read the label before usage.",
+                    'price' => $item['price'],
+                    'stock_quantity' => $item['stock'],
+                    'sku' => strtoupper(substr($item['brand'], 0, 3)) . '-' . rand(10000, 99999),
+                    'batch_number' => 'BCH-' . rand(1000, 9999),
+                    'requires_prescription' => $item['rx'],
+                    'is_featured' => rand(1, 10) > 7 ? 1 : 0,
+                    'is_new_arrival' => rand(1, 10) > 8 ? 1 : 0,
+                    'is_best_seller' => rand(1, 10) > 7 ? 1 : 0,
+                    'status' => 1,
+                ]
+            );
 
-            ProductImage::create([
-                'product_id' => $product->id,
-                'image_path' => trim($item['img']),
-                'is_primary' => 1,
-            ]);
+            ProductImage::firstOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'image_path' => trim($item['img'])
+                ],
+                [
+                    'is_primary' => 1,
+                ]
+            );
         }
     }
 }
